@@ -71,10 +71,9 @@
 
 (defn player-assemble-rat
   [player modules]
-  (if (player-can-assemble-rat? player modules)
     (assoc
      (update-in player [:rats] conj (->rat player modules))
-     :modules (set/difference (:modules player) modules))))
+     :modules (set/difference (:modules player) modules)))
 
 (defn player-can-send-rat-to-arena?
   [player rat]
@@ -125,7 +124,15 @@
     (bite attacker target)))
 
 
-;; (defn assemble-rat
-;;   [modules]
-;;   {:pre (count mo)}
-  ;;   )
+(defn ->game-room
+  [players hunger-speed charge-speed]
+  {:players (set players)
+   :hunger-speed hunger-speed
+   :charge-speed charge-speed})
+
+
+
+(defn tick [game-room]
+
+
+  )
