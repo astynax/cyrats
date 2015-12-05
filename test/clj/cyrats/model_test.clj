@@ -34,8 +34,31 @@
   (testing "rat stats"
       (is (= (rat-stats default-rat)
              {:hp 111
-               :ap 222
-               :dp 333}))))
+              :ap 222
+              :dp 333}))))
+
+
+(deftest test-rat-energy-required
+  (testing "rat sum of all stats"
+    (is (= (rat-energy-required default-rat) 666))))
+
+(deftest test-rat-alive
+  (testing "testing rat positive hp"
+    (is (true? (rat-is-alive? (assoc default-rat :arena-hp 100)))))
+  (testing "testing rat zero hp"
+    (is (false? (rat-is-alive? (assoc default-rat :arena-hp 0)))))
+  (testing "testing rat negative hp"
+    (is (false? (rat-is-alive? (assoc default-rat :arena-hp -100))))))
+
+(deftest test-rat-can-loot
+  (testing "testing rat empty backpack"
+    (is (true? (rat-can-loot? default-rat))))
+  (testing "testing rat not full backpack"
+    (is (true? (rat-can-loot? (update-in default-rat [:backpack] conj 1)))))
+  (testing "testing rat full backpack"
+    (is (false? (rat-can-loot? (update default-rat :backpack conj 1 2 3)))))
+  (testing "testing rat overflow backpack"
+    (is (false? (rat-can-loot? (update default-rat :backpack conj 1 2 3 4))))))
 
 ;; (deftest test-rat-can-fight
 ;;   (testing "rat full backpack"

@@ -1,4 +1,5 @@
-(ns cyrats.model)
+(ns cyrats.model
+  (:require [clojure.set :as set]))
 
 (defn ->food [])
 
@@ -23,10 +24,6 @@
    :backpack []
    })
 
-(defn prepare-rat-for-arena
-  [rat]
-  (assoc rat :arena-hp (:hp (merge-module-stats (:modules rat)))))
-
 (defn rat-stats
   [{modules :modules}]
   (merge-module-stats modules))
@@ -35,21 +32,24 @@
   [rat]
   (apply + (vals (rat-stats rat))))
 
+;; arena rat
 (defn rat-is-alive?
-  [rat]
-  (pos? (:arena-hp rat)))
+  [{arena-hp :arena-hp}]
+  (pos? arena-hp))
 
-(defn rat-is-not-full?
-  [rat]
-  (>= 3 (count (:backpack rat))))
+(defn rat-can-loot?
+  [{backpack :backpack}]
+  (> 3 (count backpack)))
+
+(defn rat-is-complete?
+  [{modules :modules}]
+  (= 3 (count modules)))
 
 (defn rat-can-fight?
   [rat]
-  (and (rat-is-alive? rat) (rat-is-not-full? rat)))
-
+  (and (rat-is-alive? rat) (rat-can-loot? rat) (rat-is-complete? rat)))
 
 ;;; player model
-
 (defn ->player
   "Player constructor"
   [modules food energy bot?]
@@ -61,8 +61,21 @@
    })
 
 (defn player-is-alive?
-  [player]
-  (> 0 (:food player)))
+  [{food :food}]
+  (pos? food))
+
+(defn player-can-assemble-rat?
+  [{player-modules :modules} modules]
+  (and
+   (= 3 (count modules))
+   (set/subset? modules player-modules)))
+
+(defn player-assemble-rat
+  [player modules]
+  (if (player-can-assemble-rat? player modules)
+    (update-in player [:rats] (->rat player modules))
+    (update player :modules )
+  ))
 
 
 ;;; arena
@@ -75,6 +88,9 @@
   [{rats :rats}]
   (partition 2 (shuffle (filter rat-can-fight? rats))))
 
+(defn prepare-rat-for-arena
+  [rat]
+  (assoc rat :arena-hp (:hp (merge-module-stats (:modules rat)))))
 
 (defn ^:dynamic *randomize-damage*
   [dmg]
@@ -94,8 +110,7 @@
         ap (:ap attacker)
         dp (:dp target)
         dmg (calculate-damage ap dp)]
-    (update target :arena-hp - dmg)
-    ))
+    (update target :arena-hp - dmg)))
 
 (defn- arena-tick
   [arena]
