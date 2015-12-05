@@ -130,9 +130,9 @@
    :hunger-speed hunger-speed
    :charge-speed charge-speed})
 
+(defn ->tick
+  [game]
+  {:messages [],
+   :game game})
 
 
-(defn tick [game-room]
-
-
-  )
