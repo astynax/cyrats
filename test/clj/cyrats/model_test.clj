@@ -9,7 +9,7 @@
 (def module1 (->module 1 2 3))
 (def module2 (->module 10 20 30))
 (def module3 (->module 100 200 300))
-(def default-modules [module1 module2 module3])
+(def default-modules #{module1 module2 module3})
 
 (deftest test-merge-module-stats
     (testing "stats merge"
@@ -74,7 +74,7 @@
            {:modules default-modules
             :food 10
             :energy 20
-            :rats []
+            :rats #{}
             :bot? false}))))
 
 (def default-player (->player (conj default-modules (->module 0 0 0)) 10 20 false))
@@ -95,4 +95,9 @@
   (testing "testing player can't assemble big rat "
     (is (false? (player-can-assemble-rat? default-player (conj default-modules (->module 1 1 1) (->module 2 2 2))))))
   (testing "testing player can't assemble rat with unknown modules"
-    (is (false? (player-can-assemble-rat? default-player (vec (repeat 3 (->module 1 1 1))))))))
+    (is (false? (player-can-assemble-rat? default-player (set (repeat 3 (->module 1 1 1))))))))
+
+(deftest test-player-assemble-rat
+  (testing "testing player can assemble normal rat "
+    (is (= (player-assemble-rat default-player default-modules)
+           (assoc default-player :modules #{(->module 0 0 0)} :rats [(->rat default-player default-modules)])))))

@@ -20,7 +20,7 @@
 (defn ->rat
   "Rat constructor"
   [owner modules]
-  {:modules modules
+  {:modules (set modules)
    :owner owner
    :backpack []})
 
@@ -53,10 +53,10 @@
 (defn ->player
   "Player constructor"
   [modules food energy bot?]
-  {:modules modules
+  {:modules (set modules)
    :food food
    :energy energy
-   :rats []
+   :rats #{}
    :bot? bot?})
 
 (defn player-is-alive?
@@ -67,35 +67,37 @@
   [{player-modules :modules} rat-modules]
   (and
    (= 3 (count rat-modules))
-   (set/subset? (set rat-modules) (set player-modules))))
+   (set/subset? rat-modules player-modules)))
 
 (defn player-assemble-rat
   [player modules]
   (if (player-can-assemble-rat? player modules)
-    (update-in player [:rats] (->rat player modules))
-    (update player :modules )))
+    (assoc
+     (update-in player [:rats] conj (->rat player modules))
+     :modules (set/difference (:modules player) modules))))
 
 (defn player-can-send-rat-to-arena?
   [player rat]
-  )
+  (and
+   (>= (:energy player) (rat-energy-required rat))
+   (contains? (:rats player) rat)))
 
 (defn player-send-rat-to-arena
-  [player rat]
-  )
+  [player rat])
 
 ;;; arena
+(defn prepare-rat-for-arena
+  [rat]
+  (assoc rat :arena-hp (:hp (merge-module-stats (:modules rat)))))
+
 (defn ->arena
   [rats]
-  {:rats rats
-   :dead []})
+  {:rats (set (map prepare-rat-for-arena rats))
+   :dead #{}})
 
 (defn pairs-for-fight
   [{rats :rats}]
   (partition 2 (shuffle (filter rat-can-fight? rats))))
-
-(defn prepare-rat-for-arena
-  [rat]
-  (assoc rat :arena-hp (:hp (merge-module-stats (:modules rat)))))
 
 (defn ^:dynamic *randomize-damage*
   [dmg]
