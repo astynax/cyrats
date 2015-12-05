@@ -15,5 +15,3 @@
 (defn socket-data->message [raw-message]
   (log/debug "Parsing raw-message " raw-message)
   (raw-message :message))
-
-

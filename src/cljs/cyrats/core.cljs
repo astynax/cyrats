@@ -4,14 +4,10 @@
    ;;[quiescent.dom :as d]
    [rum.core :as rum]
    [cyrats.model :as m]
+   [cyrats.state :refer [STATE]]
    [cyrats.sockets :as sockets]
    [goog.events])
   (:import [goog.history Html5History EventType]))
-
-(defonce STATE (atom {:page :index
-                      :arenas [[1 "Arena 1"]
-                               [2 "Arena 2"]
-                               [3 "Arena 3"]]}))
 
 ;; browser history manipulation
 ;; source:

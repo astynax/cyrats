@@ -4,6 +4,7 @@
             [cljs-uuid-utils.core :as uuid]
             [cyrats.messages :as messages]
             [taoensso.timbre :as log]
+            [cyrats.state :refer [STATE]]
             [cljs.core.async :refer [<! >! put! close!]])
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -69,5 +70,9 @@
 (defonce handlers-map {
                        :debug (fn [message]
                                 (log/debug "Debug answer " message))
+                       :state (fn [[_ state]]
+                                (log/debug "SET STATE " state)
+                                (swap! STATE assoc :arenas (state :arenas))
+                                )
                        })
 
