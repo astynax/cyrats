@@ -29,7 +29,7 @@
 (defn make-modules-for-game []
   (map #(apply ->module %) (shuffle (selections [0 1 2 3 4] 3))))
 
-(defn stats
+(defn rat-stats
   [{modules :modules}]
   (merge-module-stats modules))
 
@@ -44,7 +44,7 @@
 
 (defn rat-energy-required
   [rat]
-  (apply + (vals (stats rat))))
+  (apply + (vals (rat-stats rat))))
 
 ;; arena rat
 (defn rat-is-alive?
@@ -97,9 +97,9 @@
 
 (defn player-assemble-rat
   [player modules]
-  (assoc
-   (update-in player [:rats] conj (->rat player modules))
-   :modules (set/difference (:modules player) modules)))
+  (-> player
+      (update-in [:rats] conj (->rat player modules))
+      (assoc :modules (set/difference (:modules player) modules))))
 
 (defn player-can-send-rat-to-arena?
   [player rat]
@@ -119,6 +119,11 @@
 
 
 (->game [1 2 3 4])
+
+(defn tick [game]
+  (-> game
+      (assoc :players (map player-tick (:players game)))
+      ))
 
 
 ;; (defn give-init-modules [players modules cnt]

@@ -1,5 +1,5 @@
-(ns cyrats.model-test
-  (:require [cyrats.model :refer :all]
+(ns cyrats.game-test
+  (:require [cyrats.game :refer :all]
             [clojure.test :refer :all]))
 
 (deftest test-module-create
@@ -27,7 +27,7 @@
 
 (deftest test-prepare-for-arena
   (testing "check :arena-hp"
-    (is (= (:arena-hp (prepare-rat-for-arena default-rat)) 111))))
+    (is (= (:arena-hp (rat-prepare-for-arena default-rat)) 111))))
 
 
 (deftest test-rat-stats
