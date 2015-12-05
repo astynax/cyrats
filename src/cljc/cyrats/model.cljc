@@ -13,6 +13,7 @@
 
 (defn merge-module-stats
   [modules]
+  ;; TODO try reduce
   (apply (partial merge-with +) modules))
 
 ;;; rat model
@@ -21,8 +22,7 @@
   [owner modules]
   {:modules modules
    :owner owner
-   :backpack []
-   })
+   :backpack []})
 
 (defn rat-stats
   [{modules :modules}]
@@ -57,26 +57,31 @@
    :food food
    :energy energy
    :rats []
-   :bot? bot?
-   })
+   :bot? bot?})
 
 (defn player-is-alive?
   [{food :food}]
   (pos? food))
 
 (defn player-can-assemble-rat?
-  [{player-modules :modules} modules]
+  [{player-modules :modules} rat-modules]
   (and
-   (= 3 (count modules))
-   (set/subset? modules player-modules)))
+   (= 3 (count rat-modules))
+   (set/subset? (set rat-modules) (set player-modules))))
 
 (defn player-assemble-rat
   [player modules]
   (if (player-can-assemble-rat? player modules)
     (update-in player [:rats] (->rat player modules))
-    (update player :modules )
-  ))
+    (update player :modules )))
 
+(defn player-can-send-rat-to-arena?
+  [player rat]
+  )
+
+(defn player-send-rat-to-arena
+  [player rat]
+  )
 
 ;;; arena
 (defn ->arena
