@@ -59,9 +59,6 @@
    :rats #{}
    :bot? bot?})
 
-(defn player-is-alive?
-  [{food :food}]
-  (pos? food))
 
 (defn player-can-assemble-rat?
   [{player-modules :modules} rat-modules]
@@ -134,5 +131,3 @@
   [game]
   {:messages [],
    :game game})
-
-
