@@ -27,11 +27,11 @@
   (log/debug "Waiting for incoming")
   (go
     (loop []
-      (let [{:keys [message error] :as msg} (<! ws-ch)]
+      (if-let [{:keys [message error] :as msg} (<! ws-ch)]
         (cond
           message (handle-server-message message)
-          error (handle-server-error error))
-        (recur)))))
+          error (handle-server-error error)))
+      (recur))))
 
 (defn send-message [type payload]
   (log/debug "Send " type " with " payload)

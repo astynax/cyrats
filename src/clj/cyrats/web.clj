@@ -7,7 +7,6 @@
              [taoensso.timbre :as log]
              [clojure.core.async :refer [>! <! go close!]]
              [cyrats.state :as state]
-
              [cyrats.messages :as messages]
              ))
 
@@ -23,16 +22,19 @@
 (defn socket-loop [ws-ch]
   (go
     (loop []
-      (if-let [message  (messages/socket-data->message (<! ws-ch))]
+      (if-let [raw-message (<! ws-ch)]
         (do
-          (let [handler (messages/message->handler message handlers-map)]
+          (let [
+                message (messages/socket-data->message raw-message)
+                handler (messages/message->handler message handlers-map)
+                
+                ]
             (if handler
               (do
                 (log/info "Will handle with " handler)
                 (if-let [answer (handler message)]
                   (send->socket answer ws-ch)))
-              (log/debug "No handler for " message)
-              ))))
+              (log/debug "No handler for " message)))))
       (recur))))
 
 (defn init-user [session-id]
@@ -83,9 +85,12 @@
   (log/info "Do nothing with " message)
   "Do nothing")
 
+
+(def COUNTER (atom 0))
 (defonce handlers-map {:event event-handler
                        :debug (fn [message]
-                                (messages/build :debug :answer)
+                                (swap! COUNTER inc)
+                                (messages/build :debug {:answer @COUNTER})
                                 )
                        })
 

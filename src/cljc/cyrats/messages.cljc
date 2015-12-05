@@ -13,7 +13,7 @@
   [message-type payload])
 
 (defn socket-data->message [raw-message]
-  (log/debug "Parsing raw-mesasge " raw-message)
+  (log/debug "Parsing raw-message " raw-message)
   (raw-message :message))
 
 
