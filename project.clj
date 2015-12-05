@@ -53,7 +53,9 @@
    {:jvm-opts ["-Xmx1g"]
     :dependencies [[org.clojure/clojurescript "1.7.170"]
                    [org.clojure/tools.nrepl "0.2.12"]
-                   [quiescent "0.2.0-RC2"]]
+                   ;;[quiescent "0.2.0-RC2"]
+                   [rum "0.6.0"]
+                   ]
     :plugins [[lein-cljsbuild "1.1.1"]
               [lein-figwheel "0.5.0-2"]]
 

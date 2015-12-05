@@ -56,9 +56,16 @@ div.rat-img {
     text-decoration: none;
 }
 
+#side-bar a {
+    display: block;
+    width: 100px;
+    text-decoration: none;
+    color: #808080;
+}
+
 #nav-bar a.nav-item { color: #808080; }
-#nav-bar a:hover { background: #404040; }
-#nav-bar a.nav-item.current { color: #FFFF80; }
+#nav-bar a:hover, #side-bar a:hover { background: #404040; }
+#nav-bar a.current, #side-bar a.current { background: #303030; }
 
 #nav-bar a.logo {
     color: white;
@@ -67,7 +74,7 @@ div.rat-img {
     margin-right: 10px;
 }
 
-div.frame {
+.frame {
     display: table-cell;
     width: 650px;
     border: 1px solid #404040;
@@ -79,6 +86,6 @@ div.frame {
     border: 1px solid #202020;
 }
 
-.frame.index pre {
+.index pre {
     padding: 10px 10px;
 }
