@@ -17,9 +17,15 @@
 ;;; rat model
 (defn ->rat
   "Rat constructor"
-  [module1 module2 module3]
-  {:modules (vec (list module1 module2 module3))
-   :backpack []})
+  [owner modules]
+  {:modules modules
+   :owner owner
+   :backpack []
+   })
+
+(defn prepare-rat-for-arena
+  [rat]
+  (assoc rat :arena-hp (:hp (merge-module-stats (:modules rat)))))
 
 (defn rat-stats
   [{modules :modules}]
@@ -31,7 +37,7 @@
 
 (defn rat-is-alive?
   [rat]
-  (> 0 (:hp (rat-stats rat))))
+  (pos? (:arena-hp rat)))
 
 (defn rat-is-not-full?
   [rat]
@@ -60,9 +66,44 @@
 
 
 ;;; arena
+(defn ->arena
+  [rats]
+  {:rats rats
+   :dead []})
+
+(defn pairs-for-fight
+  [{rats :rats}]
+  (partition 2 (shuffle (filter rat-can-fight? rats))))
+
+
+(defn ^:dynamic *randomize-damage*
+  [dmg]
+  (* dmg (+ 0.75 (rand 0.75))))
+
+(defn calculate-damage
+  [ap dp]
+  (let [ap' (float ap)]
+    (*randomize-damage*
+        (if (zero? dp)
+        ap'
+        (/ ap' dp)))))
+
+(defn bite
+  [attacker target]
+  (let [
+        ap (:ap attacker)
+        dp (:dp target)
+        dmg (calculate-damage ap dp)]
+    (update target :arena-hp - dmg)
+    ))
+
+(defn- arena-tick
+  [arena]
+  (doseq [[attacker target] (pairs-for-fight arena)]
+    (bite attacker target)))
 
 
 ;; (defn assemble-rat
 ;;   [modules]
 ;;   {:pre (count mo)}
-;;   )
+  ;;   )
