@@ -3,7 +3,9 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.7.0"]]
+  :dependencies [[org.clojure/clojure "1.7.0"]
+                 [com.taoensso/timbre "4.1.4"]
+                 ]
   :profiles
   {:repl
    {:dependencies [[org.clojure/tools.nrepl "0.2.12"]
@@ -15,6 +17,10 @@
    :server-commons
    {:dependencies [[http-kit "2.1.19"]
                    [compojure "1.4.0"]
+                   [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                   [jarohen/chord "0.6.0"]
+                   [ring/ring-core "1.4.0"] ;; session middleware
+                   [ring/ring-defaults "0.1.1"]
                    [com.stuartsierra/component "0.3.0"]
                    [sonian/carica "1.2.1" :exclusions [[cheshire]]]]
     :source-paths ["src/clj"
@@ -55,7 +61,9 @@
                    [org.clojure/tools.nrepl "0.2.12"]
                    ;;[quiescent "0.2.0-RC2"]
                    [rum "0.6.0"]
-                   ]
+                   [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                   [jarohen/chord "0.6.0"]
+                   [com.lucasbradstreet/cljs-uuid-utils "1.0.2"]]
     :plugins [[lein-cljsbuild "1.1.1"]
               [lein-figwheel "0.5.0-2"]]
 
@@ -77,7 +85,13 @@
                               "src/cljs"]
                :compiler {:output-to "resources/public/main.js"
                           :optimizations :simple
-                          :pretty-print false}}}
+                          :pretty-print false}}
+              :dev-auto
+              {:source-paths ["src/cljc"
+                              "src/cljs"]
+               :compiler {:output-to "resources/public/main.js"
+                          :optimizations :none
+                          :pretty-print true}}}
      }}
    }
 
@@ -92,6 +106,6 @@
    ;; launches autorunner for unit-tests
    "autotest" ["with-profile" "dev,test" "auto" "test"]
 
-   "autojs" ["with-profile" "cljs" "cljsbuild" "auto" "prod" ]
+   "autojs" ["with-profile" "cljs" "cljsbuild" "auto" "dev-auto" ]
    }
   )
