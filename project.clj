@@ -8,11 +8,16 @@
   :profiles
   {:repl {:dependencies [[org.clojure/tools.nrepl "0.2.12"]]}
 
-   :clj {:jvm-opts ["-Xmx512m"]
-         :source-paths ["src/cljc"]
-         :test-paths ["test/clj"]
-         :auto {:default {:file-pattern #"\.(clj|cljs|cljc)$"}}
+   :dev {:dependencies [[http-kit "2.1.19"]]
+         :source-paths ["src/clj"
+                        "src/cljc"]
          }
+
+   :test {:plugins [[lein-auto "0.1.2"]]
+          :jvm-opts ["-Xmx256m"]
+          :test-paths ["test/clj"]
+          :auto {:default {:file-pattern #"\.(clj|cljs|cljc)$"}}
+          }
 
    :cljs {:jvm-opts ["-Xmx1g"]
           :dependencies [[org.clojure/clojurescript "1.7.170"]
@@ -45,7 +50,8 @@
 
   :figwheel {:css-dirs ["resources/public"]}
 
-  :aliases {"fw" ["with-profile" "user,cljs" "figwheel"]
+  :aliases {"fw" ["with-profile" "repl,cljs" "figwheel"]
             "prod" ["with-profile" "cljs" "cljsbuild" "once" "prod"]
-            "autotest" ["with-profile" "clj" "auto" "test"]}
+            "autotest" ["with-profile" "dev,test" "auto" "test"]
+            }
   )
