@@ -4,7 +4,7 @@
              [compojure.route :as route]
              [chord.http-kit :as chord]
              [ring.util.response :as response]
-             [clojure.tools.logging :as log]
+             [taoensso.timbre :as log]
              [clojure.core.async :refer [>! <! go close!]]
              [cyrats.state :as state]
              ))

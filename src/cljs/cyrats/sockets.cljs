@@ -2,6 +2,7 @@
   (:require [chord.client :refer [ws-ch]]
             [cyrats.local-storage :as storage]
             [cljs-uuid-utils.core :as uuid]
+            [taoensso.timbre :as log]
             [cljs.core.async :refer [<! >! put! close!]])
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -9,17 +10,16 @@
 (def SOCKET (atom nil))
 
 (defn register-channel [ws-ch]
-  (js/console.log "Saving socket")
+  (log/debug "Saving socket")
   (reset! SOCKET ws-ch))
 
 (defn handle-server-message [message error]
-  (.log js/console "M " message " Er " error))
+  (log/debug "M " message " Er " error))
 
 (defn listen-channel [ws-ch]
-  (.log js/console "Waiting for incoming")
+  (log/debug "Waiting for incoming")
   (go
     (loop []
-      (.log js/console "BEFORE")
       (let [{:keys [message error] :as msg} (<! ws-ch)]
         (when message
           (handle-server-message message error)
@@ -30,7 +30,7 @@
     ))
 
 (defn send-message [type payload]
-  (.log js/console "Send " type " with " payload)
+  (log/debug "Send " type " with " payload)
   (go
     (>! @SOCKET [type payload])))
 
@@ -51,11 +51,11 @@
     (let [{:keys [ws-channel error]} (<! (ws-ch "ws://localhost:8080/ws"))]
       (if-not error
         (do
-          (js/console.log "Connected!")
+          (log/debug "Connected!")
           (register-channel ws-channel)
           (send-message :auth (get-session-id))
           (listen-channel ws-channel))        
-        (js/console.log "Error:" (pr-str error))))))
+        (log/debug "Error:" (pr-str error))))))
 
 
 (defonce _ (do
