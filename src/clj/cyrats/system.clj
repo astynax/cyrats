@@ -35,5 +35,6 @@
 (defn -main [& args]
   (let [server-config (or (config :server)
                           {:port 8080})]
+    
     (.start (create-system (:port server-config)))
     ))
