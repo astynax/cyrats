@@ -4,19 +4,22 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]]
-
   :profiles
   {:repl
-   {:dependencies [[org.clojure/tools.nrepl "0.2.12"]]}
+   {:dependencies [[org.clojure/tools.nrepl "0.2.12"]
+                   [reloaded.repl "0.1.0"]]
+    :source-paths ["dev" "test/clj"]
+    }
 
    ;; commons for server-side
    :server-commons
    {:dependencies [[http-kit "2.1.19"]
                    [compojure "1.4.0"]
+                   [com.stuartsierra/component "0.3.0"]
                    [sonian/carica "1.2.1" :exclusions [[cheshire]]]]
     :source-paths ["src/clj"
                    "src/cljc"]
-    :main cyrats.server
+    :main cyrats.system
     }
 
    ;; dev customizations
@@ -30,7 +33,7 @@
    :server-overrides
    {:jvm-opts ["-Xmx1g"
                "-server"]
-    :aot [cyrats.server]
+    :aot [cyrats.system]
     }
 
    ;; compound profiles (don't edit, use -commons and -overrides instead)
@@ -85,5 +88,6 @@
    "prod" ["with-profile" "cljs" "cljsbuild" "once" "prod"]
    ;; launches autorunner for unit-tests
    "autotest" ["with-profile" "dev,test" "auto" "test"]
+   
    }
   )
