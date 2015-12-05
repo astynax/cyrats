@@ -52,7 +52,7 @@
 
 (defn connect-ws []
   (go
-    (let [{:keys [ws-channel error]} (<! (ws-ch "ws://localhost:8000/ws"))]
+    (let [{:keys [ws-channel error]} (<! (ws-ch "ws://localhost:8000/ws"))] ;; FUCK
       (if-not error
         (do
           (log/debug "Connected!")
