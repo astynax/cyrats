@@ -8,4 +8,16 @@ And so it goes, Great Cycle Of Life:
 Build. Wait. Eat.
 Rinse. Repeat.
 Die."
+    :ending "No food. No rats. No hope."
+    :death #{
+    	   "Shower of sparks lit up bleak landscape for a minute, as {{winner}} tore monstrous gash in {{loser}}"
+	   "Inhuman screech from {{loser}} rolled across hills, deafening audio receptors of others for a moment."
+           "{{winner}} rends metal and splits wires, goring {{loser}} and claiming day for itself."
+           "{{winner}} smells victory and put itself into dismantling {{loser}} with extreme prejudice."
+           "{{winner}} feels no mercy, knows no pain, sees no trouble in dispatching {{loser}}."
+           "Thou shall fear no evil. Except, perhaps, for {{winner}}. Oh, well, too late. Good night, sweet {{loser}}."
+           "Klaxons of danger wailed in the cybernetic mind of {{loser}}, preceding its horrific death at the fangs of {{winner}}."
+           "Despair gripped pseudo-AI of {{loser}}, just moments before unforgiving claws of {{winner}} ripped it in half."
+           "{{winner}} WINS. {{loser}} DIES."
+    }
 }
