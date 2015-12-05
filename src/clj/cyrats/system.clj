@@ -5,9 +5,7 @@
             [compojure.handler :refer [site]]
             [carica.core :refer [config]]
             [cyrats.web :refer [application]]
-            [ring.middleware.session.cookie :refer [cookie-store]]
-
-            ))
+            [ring.middleware.session.cookie :refer [cookie-store]]))
 
 (defonce SESSION-STORE (cookie-store))
 

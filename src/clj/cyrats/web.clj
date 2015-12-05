@@ -7,16 +7,13 @@
              [taoensso.timbre :as log]
              [clojure.core.async :refer [>! <! go close!]]
              [cyrats.state :as state]
+
+             [cyrats.messages :as messages]
              ))
 
 (def handlers-map)
 
 (def CLIENTS (atom {}))
-
-(defn dispatch-handler [[type payload]]
-  (log/info "Dispatching message " type " with " payload)
-  (if-let [handler (type handlers-map)]
-    handler))
 
 (defn send->socket [answer ws-ch]
   (log/info "Sending " answer " to " ws-ch)
@@ -26,30 +23,28 @@
 (defn socket-loop [ws-ch]
   (go
     (loop []
-     (if-let [{:keys [message]} (<! ws-ch)]
-       (do
-         (log/info "Message " message " " (type message))
-         (let [handler (dispatch-handler message)]
-           (log/info "Got incoming message " message)
-           (if handler
-             (do
-               (log/info "Will handle with " handler)
-               (if-let [answer (handler message)]
-                 (send->socket answer ws-ch)))
-             ))))
-     (recur))))
-
+      (if-let [message  (messages/socket-data->message (<! ws-ch))]
+        (do
+          (let [handler (messages/message->handler message handlers-map)]
+            (if handler
+              (do
+                (log/info "Will handle with " handler)
+                (if-let [answer (handler message)]
+                  (send->socket answer ws-ch)))
+              (log/debug "No handler for " message)
+              ))))
+      (recur))))
 
 (defn init-user [session-id]
   (log/info "Will init session for " session-id)
   (if-let [ws-ch (@CLIENTS session-id)]
     (do
       (log/info "Sending world state to " session-id)
-      (send->socket (state/get-state) ws-ch)
-      )
-    (log/info "Have no session for " session-id)
-    )
-  )
+      (let [message (messages/build :state
+                                    (state/get-state))]
+        (send->socket message ws-ch)
+        ))
+    (log/info "Have no session for " session-id)))
 
 
 (defn register-socket [session-id ws-ch]
@@ -79,10 +74,7 @@
        (let [response (application (assoc req :uri "/index.html"))
              session (req :session)]
          (log/info "REQUEST " req)
-         (assoc response :session session)
-         
-         
-         ))
+         (assoc response :session session)))
   (route/resources "")
   (GET "/ws" [] ws-handler)
   (route/not-found "Page not found :("))
@@ -91,20 +83,9 @@
   (log/info "Do nothing with " message)
   "Do nothing")
 
-(defn -register-channel [key ws-ch]
-  (log/info "Registering socket for " key)
-  (if-let [old-socket (@CLIENTS key)]
-    (do
-      (log/info "Closing previous socket for " key)
-      (close! old-socket)
-      ))
-  (swap! CLIENTS assoc key ws-ch)
-  (go
-    (>! ws-ch "Answer from server")))
-
 (defonce handlers-map {:event event-handler
                        :debug (fn [message]
-                                [:debug :answer]
+                                (messages/build :debug :answer)
                                 )
                        })
 

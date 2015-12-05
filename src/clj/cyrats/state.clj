@@ -2,5 +2,4 @@
 
 (def STATE (atom {:arenas []}))
 
-(defn get-state []
-  [:state @STATE])
+(defn get-state [] @STATE)

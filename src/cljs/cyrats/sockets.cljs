@@ -2,32 +2,36 @@
   (:require [chord.client :refer [ws-ch]]
             [cyrats.local-storage :as storage]
             [cljs-uuid-utils.core :as uuid]
+            [cyrats.messages :as messages]
             [taoensso.timbre :as log]
             [cljs.core.async :refer [<! >! put! close!]])
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
 
-
 (def SOCKET (atom nil))
+
+(def handlers-map) ;; use for message dispatching
 
 (defn register-channel [ws-ch]
   (log/debug "Saving socket")
   (reset! SOCKET ws-ch))
 
-(defn handle-server-message [message error]
-  (log/debug "M " message " Er " error))
+(defn handle-server-message [message]
+  (if-let [handler (messages/message->handler message handlers-map)]
+    (handler message)
+    (log/debug "No handler for " message)))
+
+(defn handle-server-error [error]
+  (log/debug "Have error " error))
 
 (defn listen-channel [ws-ch]
   (log/debug "Waiting for incoming")
   (go
     (loop []
       (let [{:keys [message error] :as msg} (<! ws-ch)]
-        (when message
-          (handle-server-message message error)
-          (recur)
-          )
-        )
-      )
-    ))
+        (cond
+          message (handle-server-message message)
+          error (handle-server-error error))
+        (recur)))))
 
 (defn send-message [type payload]
   (log/debug "Send " type " with " payload)
@@ -62,4 +66,8 @@
              (connect-ws)))
 
 
+(defonce handlers-map {
+                       :debug (fn [message]
+                                (log/debug "Debug answer " message))
+                       })
 
