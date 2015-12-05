@@ -30,9 +30,9 @@
     (loop []
       (if-let [{:keys [message error] :as msg} (<! ws-ch)]
         (cond
-          message (handle-server-message message)
-          error (handle-server-error error)))
-      (recur))))
+          message (do (handle-server-message message)
+                      (recur))
+          error (handle-server-error error))))))
 
 (defn send-message [type payload]
   (log/debug "Send " type " with " payload)
