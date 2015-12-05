@@ -75,10 +75,10 @@
 
 ;;; player
 
-(defn ->player [modules name food energy]
+(defn ->player [modules food energy]
   {:modules (set modules)
    :food food
-   :name name
+   :name "foo"
    :energy energy})
 
 (defn player-tick [player]
@@ -125,6 +125,15 @@
       (assoc :players (map player-tick (:players game)))
       ))
 
+(defn give-init-modules [players]
+  (let [all-modules (make-modules-for-game)]
+    (loop [player (first players) pmodules (take 5 all-modules) acc []]
+      (if (nil? player)
+        acc
+        (recur (rest players) (drop 5 all-modules) (conj acc (->player pmodules 10 20 )))))))
+
 
 ;; (defn give-init-modules [players modules cnt]
 ;;   (map #(update % :modules (take cnt 
+(give-init-modules [:1 :2])
+
