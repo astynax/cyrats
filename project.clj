@@ -60,7 +60,7 @@
               {:figwheel true
                :source-paths ["src/cljc"
                               "src/cljs"]
-               :compiler {:output-to "target/classes/public/app.js"
+               :compiler {:output-to "target/classes/public/main.js"
                           :output-dir "target/classes/public/out"
                           :asset-path "out"
                           :main "cyrats.core"
@@ -70,8 +70,7 @@
               {:source-paths ["src/cljc"
                               "src/cljs"]
                :compiler {:output-to "resources/public/main.js"
-                          :main "cyrats.core"
-                          :optimizations :advanced
+                          :optimizations :simple
                           :pretty-print false}}}
      }}
    }
