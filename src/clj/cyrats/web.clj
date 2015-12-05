@@ -9,6 +9,8 @@
   (GET "/" req
        (application (assoc req :uri "/index.html")))
 
+  
+
   (route/resources "")
 
   (route/not-found "Page not found :("))

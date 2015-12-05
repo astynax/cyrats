@@ -52,6 +52,7 @@
    :cljs
    {:jvm-opts ["-Xmx1g"]
     :dependencies [[org.clojure/clojurescript "1.7.170"]
+                   [org.clojure/tools.nrepl "0.2.12"]
                    [quiescent "0.2.0-RC2"]]
     :plugins [[lein-cljsbuild "1.1.1"]
               [lein-figwheel "0.5.0-2"]]
@@ -83,11 +84,12 @@
 
   :aliases
   {;; launches figwheel
-   "fw" ["with-profile" "repl,cljs" "figwheel"]
+   "fw" ["with-profile" "cljs" "figwheel"]
    ;; generates a prod version of the JS-library
    "prod" ["with-profile" "cljs" "cljsbuild" "once" "prod"]
    ;; launches autorunner for unit-tests
    "autotest" ["with-profile" "dev,test" "auto" "test"]
-   
+
+   "autojs" ["with-profile" "cljs" "cljsbuild" "auto" "prod" ]
    }
   )
