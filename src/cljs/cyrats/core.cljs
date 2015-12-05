@@ -4,6 +4,7 @@
    ;;[quiescent.dom :as d]
    [rum.core :as rum]
    [cyrats.model :as m]
+   [cyrats.sockets :as sockets]
    [goog.events])
   (:import [goog.history Html5History EventType]))
 
@@ -92,6 +93,10 @@
 
 ;; frames ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn onclick-fn [event]
+  (sockets/send-message :debug :payload)
+  )
+
 (rum/defc index-frame < rum.core/static
   [_ state]
   [:div {:class "index"}
@@ -104,7 +109,9 @@ And so it goes, Great Cycle Of Life:
 Build. Wait. Eat.
 Rinse. Repeat.
 Die."]
-   [:img {:src "/static/battleground.png"}]
+   [:img {:src "/static/battleground.png"
+          :onClick onclick-fn ;; stupid way of debugging sockets
+          }]
    ])
 
 (rum/defc stub-frame
