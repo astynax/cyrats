@@ -14,6 +14,3 @@
   (let [message (messages/build :arena-subscribe arena-id)]
     (sockets/send-message message))
   (log/debug "Subscribed to arena " arena-id))
-
-
-

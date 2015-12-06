@@ -87,7 +87,12 @@
                                 (swap! COUNTER inc)
                                 (messages/build :debug {:answer @COUNTER})
                                 )
-                       :arena-subscribe (fn [session-id [_ arena-id]] (log/debug "Subscribing " session-id " to " arena-id))
-                       :arena-unsubscribe (fn [session-id [_ arena-id]] (log/debug "Unsubscribing " session-id " from " arena-id))
+                       :arena-subscribe (fn [session-id [_ arena-id]]
+                                          (state/subscribe-arena session-id arena-id)
+                                          (messages/build :subscribed :ok))
+                       :arena-unsubscribe (fn [session-id [_ arena-id]]
+                                            (state/unsubscribe-arena session-id arena-id)
+                                            (messages/build :unsubscribed :ok)
+                                            )
                        })
 
