@@ -109,12 +109,10 @@ Die."]
 
 (rum/defc arena-frame
   [state arena-id]
-  (log/debug "STATE " state)
   [:div {:class "arena"}
-   (for [x (state :messages)]
-     [:p "Message: " (:payload x)]
-     )
-   ])
+   (for [x (state :messages)
+         :when (= arena-id (:arena-id x))]
+     [:p "Message: " (:payload x)])])
 
 (rum/defc stub-frame
   [_]
@@ -162,7 +160,7 @@ Die."]
                                         (match
                                           [(state :page)]
                                           [[:arena arena-id]] (arena/subscribe-arena arena-id)
-                                        :else nil))
+                                          :else nil))
            )
 
 (refresh @STATE)
