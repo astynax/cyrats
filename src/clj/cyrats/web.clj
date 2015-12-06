@@ -8,7 +8,8 @@
              [clojure.core.async :refer [>! <! go close!]]
              [cyrats.state :as state]
              [cyrats.messages :as messages]
-             [cyrats.sockets :refer [register-socket socket-loop]]
+             [cyrats.sockets :refer [register-socket]]
+             [cyrats.socket-handlers :refer [socket-loop]]
              ))
 
 (defn ws-handler [req]
