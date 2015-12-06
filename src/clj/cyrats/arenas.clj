@@ -3,6 +3,7 @@
             [clojure.core.match :refer [match]]
             [taoensso.timbre :as log]
             [cyrats.sockets :as sockets]
+            [cyrats.state :refer [STATE]]
             [clojure.core.async :refer [go close! <! >! timeout alts!! chan]]
             ))
 
@@ -29,9 +30,15 @@
   "Do nothing, should put in state")
 
 (defn new-event [arena-id payload]
-  (go
-    (>! EVENTS-CHANNEL {:arena-id arena-id
-                        :payload payload})))
+  (let [message {:arena-id arena-id
+                 :payload payload}]
+    (swap! STATE (fn [state]
+                   (let [old-messages (state :messages)
+                         new-messages (conj old-messages message)]
+                     (assoc state :messages new-messages)
+                     )))
+    (go
+      (>! EVENTS-CHANNEL message))))
 
 
 (defn subscribe-arena [session-id arena-id]
@@ -46,7 +53,7 @@
   (log/debug "HAVE MESSAGE " event)
   (let [
         {:keys [arena-id payload]} event
-        outgoing-message (messages/build :arena-event [arena-id payload])
+        outgoing-message (messages/build :arena-event event)
         subscribers (@SUBSCRIPTIONS arena-id)
         ]
     (log/debug "Subscribers " subscribers)

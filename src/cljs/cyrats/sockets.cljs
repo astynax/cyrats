@@ -18,7 +18,10 @@
 
 (defn handle-server-message [message]
   (if-let [handler (messages/message->handler message handlers-map)]
-    (handler message)
+    
+    (do
+      (log/debug "DISPATCHED MESSAGE " message)
+      (handler message))
     (log/debug "No handler for " message)))
 
 (defn handle-server-error [error]
@@ -70,8 +73,23 @@
 (defonce handlers-map {
                        :debug (fn [message]
                                 (log/debug "Debug answer " message))
+                       :arena-event (fn [[_ message]]
+                                      (log/debug "NEW MESsSAGE " message)
+                                      (swap! STATE
+                                             (fn [state] (let [old-messages (state :messages)
+                                                               new-messages (conj old-messages message)]
+                                                           (assoc state :messages new-messages)                                                           
+                                                           )
+
+                                               )))
                        :state (fn [[_ state]]
                                 (log/debug "SET STATE " state)
-                                (swap! STATE assoc :arenas (state :arenas)))})
+                                (swap! STATE
+                                       #(-> @STATE
+                                            (assoc :arenas (state :arenas))
+                                            (assoc :messages (state :messages))
+                                            )
+                                       )
+                                (log/debug "NEW STATE " @STATE))})
 
 

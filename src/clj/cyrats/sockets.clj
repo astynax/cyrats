@@ -35,3 +35,10 @@
       (close! old-socket)))
   (swap! CLIENTS assoc session-id ws-ch)
   (init-user session-id))
+
+(defn unregister-socket [session-id]
+  (log/debug "Closing socket for " session-id)
+  (if-let [ws-ch (@CLIENTS session-id)]
+    (close! ws-ch)
+    (swap! CLIENTS dissoc session-id)  
+    ))

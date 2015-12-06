@@ -4,7 +4,6 @@
             [cyrats.messages :as messages]
             [cyrats.sockets :as sockets]))
 
-
 (defn unsubscribe-arena [arena-id]
   (let [message (messages/build :arena-unsubscribe arena-id)]
     (sockets/send-message message))

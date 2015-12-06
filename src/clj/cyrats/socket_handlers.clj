@@ -3,7 +3,7 @@
             [cyrats.arenas :as arenas]
             [taoensso.timbre :as log]
             [clojure.core.async :refer [>! <! go close!]]
-            [cyrats.sockets :as sockets]))
+            [cyrats.sockets :refer [CLIENTS send->socket unregister-socket]]))
 
 ;; Debug
 (def COUNTER (atom 0))
@@ -18,13 +18,13 @@
                                           (messages/build :subscribed :ok))
                        :arena-unsubscribe (fn [session-id [_ arena-id]]
                                             (arenas/unsubscribe-arena session-id arena-id)
-                                            (messages/build :unsubqscribed :ok)
+                                            (messages/build :unsubscribed :ok)
                                             )
                        })
 
 
 (defn socket-loop [session-id]
-  (let [ws-ch (@sockets/CLIENTS session-id)]
+  (let [ws-ch (@CLIENTS session-id)]
     (go
       (loop []
         (if-let [raw-message (<! ws-ch)] ;; split me into separate functions
@@ -38,10 +38,9 @@
                 (do
                   (log/info "Will handle with " handler)
                   (if-let [answer (handler session-id message)]
-                    (sockets/send->socket answer ws-ch)))
+                    (send->socket answer ws-ch)))
                 (log/debug "No handler for " message)))
             (recur))
-          (do ;; this to close-socket
-            (log/debug "Closing socket for " session-id)
-            (close! ws-ch)
-            (swap! @sockets/CLIENTS dissoc session-id)))))))
+          (do
+            (unregister-socket session-id)
+            ))))))
