@@ -22,9 +22,10 @@
   (if-let [ws-ch (@CLIENTS session-id)]
     (do
       (log/info "Sending world state to " session-id)
-      (let [message (messages/build :state
-                                    (state/get-state))]
-        (send->socket message ws-ch)))
+      (let [state-message (messages/build :state (state/get-state))
+            page-message (messages/build :page (@state/PAGES session-id :index))]
+        (send->socket state-message ws-ch)
+        (send->socket page-message ws-ch)))
     (log/info "Have no session for " session-id)))
 
 (defn register-socket [session-id ws-ch]

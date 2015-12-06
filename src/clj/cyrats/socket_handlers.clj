@@ -1,6 +1,7 @@
 (ns cyrats.socket-handlers
   (:require [cyrats.messages :as messages]
             [cyrats.arenas :as arenas]
+            [cyrats.state :as state]
             [taoensso.timbre :as log]
             [clojure.core.async :refer [>! <! go close!]]
             [cyrats.sockets :refer [CLIENTS send->socket unregister-socket]]))
@@ -20,6 +21,11 @@
                                             (arenas/unsubscribe-arena session-id arena-id)
                                             (messages/build :unsubscribed :ok)
                                             )
+
+                       :page (fn [session-id [_ page]]
+                          (log/debug "page handler " page)
+                          (swap! state/PAGES assoc session-id page)
+                          )
                        })
 
 

@@ -16,7 +16,8 @@
                             ]}))
 
 
-
+;; Temporary storage for pages
+(def PAGES (atom {}))
 
 (defn get-state [] @STATE)
 

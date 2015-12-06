@@ -90,6 +90,10 @@
                                             (assoc :messages (state :messages))
                                             )
                                        )
+                                (log/debug "NEW STATE " @STATE))
+                        :page (fn [[_ page]]
+                                (log/debug "SET page " page)
+                                (swap! STATE assoc :page page)
                                 (log/debug "NEW STATE " @STATE))})
 
 

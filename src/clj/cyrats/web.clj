@@ -28,6 +28,13 @@
              session (req :session)]
          (log/info "REQUEST " req)
          (assoc response :session session)))
+
+  (GET "/arena/:id" req
+       (let [response (application (assoc req :uri "/index.html"))
+             session (req :session)]
+         (log/info "REQUEST " req)
+         (assoc response :session session)))
+
   (route/resources "")
   (GET "/ws" [] ws-handler)
   (route/not-found "Page not found :("))

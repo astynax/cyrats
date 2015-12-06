@@ -7,6 +7,7 @@
    [cyrats.state :refer [STATE]]
    [cyrats.arena :as arena]
    [cyrats.sockets :as sockets]
+   [cyrats.messages :as messages]
    [goog.events]
    [taoensso.timbre :as log]
    [cljs.core.match :refer-macros [match]]
@@ -41,7 +42,9 @@
     (.setEnabled true)))
 
 (defn- nav! [token page]
+  (js/console.log (str "Nav! " token page))
   (.setToken history token)
+  (sockets/send-message (messages/build :page page))
   (swap! STATE assoc :page page))
 
 ;; UI
