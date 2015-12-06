@@ -45,7 +45,7 @@
         [heads [_ & tails]] (split-with #(not= % x) coll)]
     [x (vec (concat heads tails))]))
 
-(defn ^:private ^:dynamic *drop-some*
+(defn- ^:dynamic *drop-some*
   [modules backpack]
   (let [drop-from (if (seq backpack) (rand-nth [:m :b]) :m)]
     (case drop-from

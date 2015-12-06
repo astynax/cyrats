@@ -14,6 +14,9 @@
   []
   (mk-rat (take 3 (shuffle *MODULES*))))
 
+(defn drop-1st-module [[m & ms] ts] [m (vec ms) ts])
+(defn drop-1st-trophy [ms [t & ts]] [t ms (vec ts)])
+
 (deftest test-rat
   (testing "rat creation"
     (let [r (mk-rat [[1 0 1]
@@ -60,13 +63,13 @@
       (let [[trophy _] (rat/drop-trophy r)]
         (is (contains? all-staff trophy)))
 
-      (with-redefs [rat/*drop-some* (fn [ms [b & bp]] [b ms bp])]
+      (with-redefs [rat/*drop-some* drop-1st-trophy]
         (let [[trophy {:keys [modules backpack]}] (rat/drop-trophy r)]
           (is (= loot1 trophy))
           (is (= modules (:modules r)))
           (is (= [loot2] backpack))))
 
-      (with-redefs [rat/*drop-some* (fn [[m & ms] bp] [m ms bp])]
+      (with-redefs [rat/*drop-some* drop-1st-module]
         (let [[trophy {:keys [modules backpack]}] (rat/drop-trophy r)]
           (is (= (game/->module 1 2 3) trophy))
           (is (= modules (rest (:modules r))))

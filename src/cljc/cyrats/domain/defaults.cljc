@@ -4,7 +4,10 @@
   {:starving-rate 1
    :energize-rate 2
    :initial-food 5
-   :initial-energy 5})
+   :initial-energy 5
+   :confront-possibility 0.3
+   :food-taking-possibility 0.2
+   })
 
 (def ^:dynamic *MODULES*
   (for [hp (range 5)
