@@ -5,7 +5,10 @@
             [compojure.handler :refer [site]]
             [carica.core :refer [config]]
             [cyrats.web :refer [application]]
-            [ring.middleware.session.cookie :refer [cookie-store]]))
+            [cyrats.arenas :as arenas]
+            [clojure.core.async :refer [go close! chan]]
+            [ring.middleware.session.cookie :refer [cookie-store]]
+            [taoensso.timbre :as log]))
 
 (defonce SESSION-STORE (cookie-store))
 
@@ -22,10 +25,20 @@
 (defrecord CyratServer [port]
   component/Lifecycle
   (start [this]
-    (assoc this :server (start-server #'application port)))
+    (let [stop-channel (chan)
+          subscription-handler (arenas/handle-subscriptions stop-channel)]
+      (-> this
+          ( assoc :server (start-server #'application port))
+          ( assoc :stop-channel stop-channel)
+          ( assoc :test "TEST"))))
+  
   (stop [this]
+    (println this)
     (stop-server (:server this))
-    (dissoc this :server)))
+    (close! (:stop-channel this))
+    
+
+    (dissoc this :stop-channel)))
 
 (defn create-system [port]
   (CyratServer. port))
