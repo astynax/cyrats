@@ -50,6 +50,8 @@
    :test
    {:plugins [[lein-auto "0.1.2"]]
     :jvm-opts ["-Xmx256m"]
+    :source-paths ["src/clj"
+                   "src/cljc"]
     :test-paths ["test/clj"]
     :auto {:default {:file-pattern #"\.(clj|cljc)$"}}
     }
@@ -104,7 +106,7 @@
    ;; generates a prod version of the JS-library
    "prod" ["with-profile" "cljs" "cljsbuild" "once" "prod"]
    ;; launches autorunner for unit-tests
-   "autotest" ["with-profile" "dev,test" "auto" "test"]
+   "autotest" ["with-profile" "test" "auto" "test"]
 
    "autojs" ["with-profile" "cljs" "cljsbuild" "auto" "dev-auto" ]
    }
