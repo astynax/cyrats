@@ -6,11 +6,11 @@
 
 ;; utils
 (defn log-message [game message]
-  (update-in game [:messages] (fn [v] (conj v message))))
+  (update-in game [:messages] conj message))
 
 (defn clear-messages
   [game]
-  (update-in game [:messages] (fn [v] (vec []))))
+  (assoc game :messages []))
 
 (defn ->module
   [hp ap dp]
@@ -25,9 +25,15 @@
   (apply (partial merge-with +) modules))
 
 
+(def MODULES
+  (for [hp (range 5)
+        ap (range 5)
+        dp (range 5)]
+    (->module hp ap dp)))
 
-(defn make-modules-for-game []
-  (map #(apply ->module %) (shuffle (selections [0 1 2 3 4] 3))))
+(defn make-modules-for-game
+  []
+  (shuffle MODULES))
 
 (defn rat-stats
   [{modules :modules}]
@@ -44,7 +50,7 @@
 
 (defn rat-energy-required
   [rat]
-  (apply + (vals (rat-stats rat))))
+  (reduce + (vals (rat-stats rat))))
 
 ;; arena rat
 (defn rat-is-alive?
@@ -134,6 +140,5 @@
 
 
 ;; (defn give-init-modules [players modules cnt]
-;;   (map #(update % :modules (take cnt 
+;;   (map #(update % :modules (take cnt
 (give-init-modules [:1 :2])
-
