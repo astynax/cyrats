@@ -34,10 +34,10 @@
                       (recur))
           error (handle-server-error error))))))
 
-(defn send-message [type payload]
-  (log/debug "Send " type " with " payload)
+(defn send-message [message]
+  (log/debug "Sending " message)
   (go
-    (>! @SOCKET [type payload])))
+    (>! @SOCKET message)))
 
 (defn generate-uuid []
   (uuid/uuid-string (uuid/make-random-uuid)))
@@ -58,7 +58,7 @@
         (do
           (log/debug "Connected!")
           (register-channel ws-channel)
-          (send-message :auth (get-session-id))
+          (send-message (messages/build :auth (get-session-id)))
           (listen-channel ws-channel))        
         (log/debug "Error:" (pr-str error))))))
 
@@ -72,7 +72,6 @@
                                 (log/debug "Debug answer " message))
                        :state (fn [[_ state]]
                                 (log/debug "SET STATE " state)
-                                (swap! STATE assoc :arenas (state :arenas))
-                                )
-                       })
+                                (swap! STATE assoc :arenas (state :arenas)))})
+
 

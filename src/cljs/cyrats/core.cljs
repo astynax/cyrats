@@ -5,8 +5,12 @@
    [rum.core :as rum]
    [cyrats.model :as m]
    [cyrats.state :refer [STATE]]
+   [cyrats.arena :as arena]
    [cyrats.sockets :as sockets]
-   [goog.events])
+   [goog.events]
+   [taoensso.timbre :as log]
+   [cljs.core.match :refer-macros [match]]
+   )
   (:import [goog.history Html5History EventType]))
 
 ;; browser history manipulation
@@ -84,17 +88,17 @@
   [:div {:id "side-bar"}
    [:ul
     (map (fn [[id title]]
-           (link "nav-item" page title [:page id] (str "/arena/" id)))
+           (link "nav-item" page title [:arena id] (str "/arena/" id)))
          arenas)]])
 
 ;; frames ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn onclick-fn [event]
-  (sockets/send-message :debug :payload)
+  (sockets/send-message [:debug :payload])
   )
 
 (rum/defc index-frame < rum.core/static
-  [_ state]
+  [state]  
   [:div {:class "index"}
    [:pre {} "Rust... Rust never changes. It creeps into your home, your things, your thoughts.
 Even food tastes a little rusty. But who I am to complain?
@@ -110,11 +114,28 @@ Die."]
           }]
    ])
 
+(rum/defc arena-frame
+  [state arena-id]
+  [:div {:class "arena"}
+   [:p (str "this is arena " arena-id)]])
+
 (rum/defc stub-frame
   [_]
   [:p "This page under construction"])
 
 ;; root widget
+
+(def PAGES {:index index-frame
+            :arena arena-frame 
+            })
+
+(defn dispatch-current-frame [page state]
+  (match page
+    [page-id page-param]
+    ((get PAGES page-id) state page-param)
+    page-id
+    ((get PAGES page-id stub-frame) state)))
+
 
 (rum/defc Window < rum.core/reactive
   []
@@ -123,9 +144,7 @@ Die."]
      (navigation-bar page)
      [:div {:id "content"}
       [:div {:class "frame"}
-       ((get {:index index-frame}
-             page
-             stub-frame) state)]
+       (dispatch-current-frame page state)]
       (sidebar page arenas)]
      (footer)]))
 
@@ -137,5 +156,16 @@ Die."]
 
 (add-watch STATE nil (fn [_ _ _ state]
                        (refresh state)))
+
+(add-watch STATE :arena-subscriptions (fn [_ _ old-state state]
+                                        (match
+                                          [(old-state :page)]
+                                          [[:arena arena-id]] (arena/unsubscribe-arena arena-id)
+                                          :else nil)
+                                        (match
+                                          [(state :page)]
+                                          [[:arena arena-id]] (arena/subscribe-arena arena-id)
+                                        :else nil))
+           )
 
 (refresh @STATE)

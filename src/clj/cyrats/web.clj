@@ -33,7 +33,7 @@
               (if handler
                 (do
                   (log/info "Will handle with " handler)
-                  (if-let [answer (handler message)]
+                  (if-let [answer (handler session-id message)]
                     (send->socket answer ws-ch)))
                 (log/debug "No handler for " message)))
             (recur))
@@ -81,16 +81,13 @@
   (GET "/ws" [] ws-handler)
   (route/not-found "Page not found :("))
 
-(defn event-handler [message]
-  (log/info "Do nothing with " message)
-  "Do nothing")
-
-
 (def COUNTER (atom 0))
-(defonce handlers-map {:event event-handler
-                       :debug (fn [message]
+(defonce handlers-map {
+                       :debug (fn [session-id message]
                                 (swap! COUNTER inc)
                                 (messages/build :debug {:answer @COUNTER})
                                 )
+                       :arena-subscribe (fn [session-id [_ arena-id]] (log/debug "Subscribing " session-id " to " arena-id))
+                       :arena-unsubscribe (fn [session-id [_ arena-id]] (log/debug "Unsubscribing " session-id " from " arena-id))
                        })
 
