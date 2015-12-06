@@ -86,6 +86,95 @@ div.rat-img {
     border: 1px solid #202020;
 }
 
-.index pre {
-    padding: 10px 10px;
+.index p, .about p, .about li {
+    font-size: 12px;
+    padding: 0 0 10px 10px;
+    margin: 0 0 0 0;
+}
+
+
+
+
+.arena table {
+    border-spacing: 0;
+}
+
+.arena td {
+    vertical-align: top;
+    padding: 0 0 0 0;
+}
+
+.arena th {
+    font-family: mono;
+    font-size: 16px;
+    text-align: center;
+    color: teal;
+}
+
+th#th-rats {
+    width: 110px;
+}
+
+th#th-modules {
+    width: 150px;
+}
+
+.arena ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+div.rat, div.module {
+    font-family: mono;
+    font-size: 14pt;
+    color: gray;
+    text-align: center;
+    border: 1px solid gray;
+    margin: 1;
+    padding-top: 3px;
+}
+
+div.rat {
+    width: 100px;
+    height: 50px;
+    cursor: pointer;
+}
+
+.selected.rat {
+    border-color: #E0E0E0;
+}
+
+div.module {
+    display: inline-block;
+    width: 45px;
+    height: 26px;
+    border-color: teal;
+    cursor: pointer;
+}
+
+span.hp {
+    color: red;
+}
+
+span.ap {
+    color: yellow;
+}
+
+span.dp {
+    color: green;
+}
+
+.rat .cells div {
+    display: inline-block;
+    width: 25px;
+    height: 15px;
+    border: 1px solid #404040;
+    margin: 1;
+    font-size: 8pt;
+    padding-top: 2px;
+}
+
+.rat .cells .full {
+    border: 1px solid teal;
+    cursor: pointer;
 }

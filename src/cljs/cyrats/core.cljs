@@ -1,16 +1,11 @@
 (ns cyrats.core
-  (:require
-   ;;[quiescent.core :as q]
-   ;;[quiescent.dom :as d]
-   [rum.core :as rum]
-   [cyrats.model :as m]
-   [goog.events])
+  (:require [rum.core :as rum]
+            [goog.events]
+            [cyrats.arena :refer [hangar]])
   (:import [goog.history Html5History EventType]))
 
 (defonce STATE (atom {:page :index
-                      :arenas [[1 "Arena 1"]
-                               [2 "Arena 2"]
-                               [3 "Arena 3"]]}))
+                      :arenas [[1 "Arena 1"]]}))
 
 ;; browser history manipulation
 ;; source:
@@ -47,7 +42,8 @@
 
 (def NAVIGATION
   [[:about ["[ About ]" "/about"]]
-   [:profile ["[ Profile ]" "/profile"]]])
+   ;;[:profile ["[ Profile ]" "/profile"]]
+   ])
 
 (defn link
   [cls current-page title page-name uri]
@@ -87,29 +83,54 @@
   [:div {:id "side-bar"}
    [:ul
     (map (fn [[id title]]
-           (link "nav-item" page title [:page id] (str "/arena/" id)))
+           (link "nav-item" page title [:arena id] (str "/arena/" id)))
          arenas)]])
 
 ;; frames ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (rum/defc index-frame < rum.core/static
-  [_ state]
+  [_]
   [:div {:class "index"}
-   [:pre {} "Rust... Rust never changes. It creeps into your home, your things, your thoughts.
-Even food tastes a little rusty. But who I am to complain?
-At least I _have_ food, what little amount my CyberRats(tm) can scrounge from the surface.
-
-And so it goes, Great Cycle Of Life:
-
-Build. Wait. Eat.
-Rinse. Repeat.
-Die."]
+   [:p "Rust... Rust never changes. It creeps into your home, your things, your thoughts."]
+   [:p "Even food tastes a little rusty. But who I am to complain?"]
+   [:p "At least I _have_ food, what little amount my CyberRats(tm) can scrounge from the surface."]
+   [:br]
+   [:p "And so it goes, Great Cycle Of Life:"]
+   [:p "Build. Wait. Eat."]
+   [:p "Rinse. Repeat."]
+   [:p "Die."]
    [:img {:src "/static/battleground.png"}]
    ])
 
+(rum/defc about-frame < rum.core/static
+  [_]
+  [:div {:class "about"}
+   [:p "Basically, it comes down to this: battles between custom CyberRats(tm) for last scraps of resources from surface.
+You may ask: 'Why not use rats? Humans are cheaper! Put one in EVA suit and get his lazy ass to work for living.'
+I wish it was that simple. Earth's surface is so thoroughly irradiated and polluted, that no amount of shielding will prevent
+you from turning into rad-ghost or, Heaven forbid, mutant scum."]
+   [:p "Enough with the flavour, here's the basics:"]
+   [:ul
+    [:li "You equip one or more CyberRats(tm) with CyberBlocks(tm). Each of those adds points to three attributes: Health, Attack and Defence."]
+    [:li "2. Attributes are summed up by category and Rat is ready to go!"]
+    [:li "3. You send one of the fully equipped CyberRats to the Surface. There it will battle other CyberRats over scraps of food and if
+victorious - bring them home."]
+    [:li "4. Repeat till the end of game session."]
+    [:li "5. If you have food by the end of session - you won!"]]
+   [:p "Amount of food in your shelter decreases by random amount at random intervals. Life is harsh, I know."]
+   [:p "Now, gear up and go! Let the scavenging begin!"]
+   ])
+
+(rum/defc arena-frame
+  [_]
+  [:div {:class "arena"}
+   [:div {:class "session-log"}]
+   [:div {:class "hangar"}
+    (hangar)]])
+
 (rum/defc stub-frame
   [_]
-  [:p "This page under construction"])
+  [:p "This page is under construction"])
 
 ;; root widget
 
@@ -120,7 +141,9 @@ Die."]
      (navigation-bar page)
      [:div {:id "content"}
       [:div {:class "frame"}
-       ((get {:index index-frame}
+       ((get {:index index-frame
+              :about about-frame
+              [:arena 1] arena-frame}
              page
              stub-frame) state)]
       (sidebar page arenas)]
