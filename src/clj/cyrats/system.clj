@@ -5,7 +5,7 @@
             [compojure.handler :refer [site]]
             [carica.core :refer [config]]
             [cyrats.web :refer [application]]
-            [cyrats.state :as state]
+            [cyrats.arenas :as arenas]
             [clojure.core.async :refer [go close! chan]]
             [ring.middleware.session.cookie :refer [cookie-store]]
             [taoensso.timbre :as log]))
@@ -26,7 +26,7 @@
   component/Lifecycle
   (start [this]
     (let [stop-channel (chan)
-          subscription-handler (state/handle-subscriptions stop-channel)]
+          subscription-handler (arenas/handle-subscriptions stop-channel)]
       (-> this
           ( assoc :server (start-server #'application port))
           ( assoc :stop-channel stop-channel)
