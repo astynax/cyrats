@@ -93,10 +93,6 @@
 
 ;; frames ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn onclick-fn [event]
-  (sockets/send-message [:debug :payload])
-  )
-
 (rum/defc index-frame < rum.core/static
   [state]  
   [:div {:class "index"}
@@ -109,15 +105,14 @@ And so it goes, Great Cycle Of Life:
 Build. Wait. Eat.
 Rinse. Repeat.
 Die."]
-   [:img {:src "/static/battleground.png"
-          :onClick onclick-fn ;; stupid way of debugging sockets
-          }]
-   ])
+   [:img {:src "/static/battleground.png"}]])
 
 (rum/defc arena-frame
   [state arena-id]
   [:div {:class "arena"}
-   [:p (str "this is arena " arena-id)]])
+   (for [x (state :messages)
+         :when (= arena-id (:arena-id x))]
+     [:p "Message: " (:payload x)])])
 
 (rum/defc stub-frame
   [_]
@@ -165,7 +160,7 @@ Die."]
                                         (match
                                           [(state :page)]
                                           [[:arena arena-id]] (arena/subscribe-arena arena-id)
-                                        :else nil))
+                                          :else nil))
            )
 
 (refresh @STATE)

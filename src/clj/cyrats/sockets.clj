@@ -4,41 +4,18 @@
    [taoensso.timbre :as log]
    [cyrats.messages :as messages]
    [cyrats.state :as state]
-   [cyrats.arenas :as arenas]
-
    ))
 
-(def handlers-map)
 (def CLIENTS (atom {}))
 
-(defn send->socket [answer ws-ch]
-  (log/info "Sending " answer " to " ws-ch)
+(defn send->socket [message ws-ch]
+  (log/info "Sending " message " to " ws-ch)
   (go
-    (>! ws-ch answer)))
+    (>! ws-ch message)))
 
-(defn socket-loop [session-id]
-  (let [ws-ch (@CLIENTS session-id)]
-    (go
-      (loop []
-        (if-let [raw-message (<! ws-ch)] ;; split me into separate functions
-          (do  ;; this to handle-message
-            (let [
-                  message (messages/socket-data->message raw-message)
-                  handler (messages/message->handler message handlers-map)
-                  
-                  ]
-              (if handler
-                (do
-                  (log/info "Will handle with " handler)
-                  (if-let [answer (handler session-id message)]
-                    (send->socket answer ws-ch)))
-                (log/debug "No handler for " message)))
-            (recur))
-          (do ;; this to close-socket
-            (log/debug "Closing socket for " session-id)
-            (close! ws-ch)
-            (swap! CLIENTS dissoc session-id)))))))
-
+(defn send->user [message user-id]
+  (let [ws-ch (@CLIENTS user-id)]
+    (send->socket message ws-ch)))
 
 (defn init-user [session-id]
   (log/info "Will init session for " session-id)
@@ -59,23 +36,15 @@
   (swap! CLIENTS assoc session-id ws-ch)
   (init-user session-id))
 
+(defn unregister-socket [session-id]
+  (log/debug "Closing socket for " session-id)
+  (if-let [ws-ch (@CLIENTS session-id)]
+    (close! ws-ch)
+    (swap! CLIENTS dissoc session-id)))
 
+(defn reinit-all-users []
+  (doseq [user-id (keys @CLIENTS)]
+    (init-user user-id)))
 
-
-
-;; Debug
-(def COUNTER (atom 0))
-
-(defonce handlers-map {
-                       :debug (fn [session-id message]
-                                (swap! COUNTER inc)
-                                (messages/build :debug {:answer @COUNTER})
-                                )
-                       :arena-subscribe (fn [session-id [_ arena-id]]
-                                          (arenas/subscribe-arena session-id arena-id)
-                                          (messages/build :subscribed :ok))
-                       :arena-unsubscribe (fn [session-id [_ arena-id]]
-                                            (arenas/unsubscribe-arena session-id arena-id)
-                                            (messages/build :unsubscribed :ok)
-                                            )
-                       })
+(add-watch state/STATE :reinit-users (fn [_ _ _ _]
+                                       (reinit-all-users)))
