@@ -14,31 +14,32 @@
                           4 #{}
                           }))
 
-
-(def ARENAS-EVENTS (atom {
-                          1 []
-                          2 []
-                          3 []
-                          4 []
-                          }))
-
 (def EVENTS-CHANNEL (chan))
 
-(add-watch ARENAS-EVENTS :arena-subscriptions (fn [_ _ old-state state]))
-
-(defn new-arena []
-  "Do nothing, should put in state")
+(defn new-arena [name]
+  (swap! STATE (fn [state]
+                 (let [old-arenas (state :arenas)
+                       new-id (+ 1 (apply max (for [[arena-id _] old-arenas] arena-id)))
+                       new-arena [new-id name]
+                       new-arenas (conj old-arenas new-arena)
+                       old-messages (state :messages)
+                       created-message {:arena-id new-id :payload "Created new area"}
+                       new-messages (conj old-messages created-message)
+                       ]
+                   (-> state
+                       (assoc :arenas new-arenas)
+                       (assoc :messages new-messages)
+                       )))))
 
 (defn new-event [arena-id payload]
   (let [message {:arena-id arena-id
                  :payload payload}]
     (swap! STATE (fn [state]
-                   (let [old-messages (state :messages)
+                   (let [old-messages (state :messages) ;; TODO: сделать скольжащее очищение 
                          new-messages (conj old-messages message)]
                      (assoc state :messages new-messages)
                      )))
-    (go
-      (>! EVENTS-CHANNEL message))))
+    ))
 
 
 (defn subscribe-arena [session-id arena-id]

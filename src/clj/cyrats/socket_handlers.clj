@@ -36,7 +36,7 @@
                   ]
               (if handler
                 (do
-                  (log/info "Will handle with " handler)
+                  (log/debug "Have handler " message)
                   (if-let [answer (handler session-id message)]
                     (send->socket answer ws-ch)))
                 (log/debug "No handler for " message)))

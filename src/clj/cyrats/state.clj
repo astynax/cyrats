@@ -13,10 +13,7 @@
                              {:arena-id 1 :payload "Message4"}
                              {:arena-id 1 :payload "Message5"}
                              {:arena-id 1 :payload "Message6"}
-                            ]
-                  }
-                 
-                 ))
+                            ]}))
 
 
 

@@ -40,5 +40,11 @@
   (log/debug "Closing socket for " session-id)
   (if-let [ws-ch (@CLIENTS session-id)]
     (close! ws-ch)
-    (swap! CLIENTS dissoc session-id)  
-    ))
+    (swap! CLIENTS dissoc session-id)))
+
+(defn reinit-all-users []
+  (doseq [user-id (keys @CLIENTS)]
+    (init-user user-id)))
+
+(add-watch state/STATE :reinit-users (fn [_ _ _ _]
+                                       (reinit-all-users)))
