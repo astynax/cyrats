@@ -2,6 +2,8 @@
   (:require [cyrats.messages :as messages]
             [clojure.core.match :refer [match]]
             [taoensso.timbre :as log]
+            [cyrats.sockets :as sockets]
+            [cyrats.state :refer [STATE]]
             [clojure.core.async :refer [go close! <! >! timeout alts!! chan]]
             ))
 
@@ -24,6 +26,21 @@
 
 (add-watch ARENAS-EVENTS :arena-subscriptions (fn [_ _ old-state state]))
 
+(defn new-arena []
+  "Do nothing, should put in state")
+
+(defn new-event [arena-id payload]
+  (let [message {:arena-id arena-id
+                 :payload payload}]
+    (swap! STATE (fn [state]
+                   (let [old-messages (state :messages)
+                         new-messages (conj old-messages message)]
+                     (assoc state :messages new-messages)
+                     )))
+    (go
+      (>! EVENTS-CHANNEL message))))
+
+
 (defn subscribe-arena [session-id arena-id]
   (let [new-subscribers (conj (@SUBSCRIPTIONS arena-id) session-id)]
     (swap! SUBSCRIPTIONS assoc arena-id new-subscribers)))
@@ -32,16 +49,17 @@
   (let [new-subscribers (disj (@SUBSCRIPTIONS arena-id) session-id)]
     (swap! SUBSCRIPTIONS assoc arena-id new-subscribers)))
 
-
-(def TICK 5000)
-
-(defn send-subscriptions [[:arena-event event]]
+(defn send-subscriptions [event]
   (log/debug "HAVE MESSAGE " event)
   (let [
-        {:keys [arena-id event-type payload]} event
-        outgoing-message (messages/build :arena-event [arena-id event-type payload])
+        {:keys [arena-id payload]} event
+        outgoing-message (messages/build :arena-event event)
+        subscribers (@SUBSCRIPTIONS arena-id)
         ]
-    (log/debug "Will answer with " outgoing-message)))
+    (log/debug "Subscribers " subscribers)
+    (doseq [user-id subscribers]
+      (sockets/send->user outgoing-message user-id)
+      (log/debug "Answering to user " user-id " with " outgoing-message))))
 
 
 (defn handle-subscriptions [stop-channel]
