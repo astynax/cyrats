@@ -12,12 +12,12 @@
 (defn game-register [game games]
   (conj games game))
 
-(defn game-can-tick [game]
+(defn game-can-tick? [game]
   (> 1 (count (filter game/player-is-alive? (:players game)))))
 
 
 (defn tick [game]
-  (if (game-can-tick game)
+  (if (game-can-tick? game)
     (assoc game :running? false)
     (-> game
         (update :tick inc)
@@ -28,7 +28,7 @@
 (defn tick-loop [games]
   (->> games)
   (map tick)
-  (filter game-can-tick))
+  (filter game-can-tick?))
 
 (def process-user-input [game msg]
   (case (:type msg)
