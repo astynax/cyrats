@@ -39,5 +39,50 @@ Amount of food in your shelter decreases by random amount at random intervals. L
 
 Now, gear up and go! Let the scavenging begin!
 "
-
+    :levels {
+	:defence [
+            "plastic"
+            "tin"
+            "aluminium"
+            "iron"
+            "composite"
+            "steel"
+            "titanium"
+            "depleted uranium"
+            "ceramite"
+            "adamantium"
+            "mithril"
+            "vibranium"
+            "unobtanium"
+        ]
+        :hp [
+            "microscopic"
+            "insignificant"
+            "tiny"
+            "small"
+            "average"
+            "larger"
+            "big"
+            "huge"
+            "badass"
+            "XXL"
+            "larger-than-life"
+            "triple-XXL"
+            "godzilla"
+        ]
+        :attack [
+	    "stick"
+            "fangs"
+            "claws"
+            "shotgun"
+            "minigun"
+            "cluster munitions"
+            "lasers"
+            "fusion shotguns"
+            "antimatter rays"
+            "interphase swords"
+            "Omega-level PSI powers"
+            "black hole generator"
+	]
+    }
 }
